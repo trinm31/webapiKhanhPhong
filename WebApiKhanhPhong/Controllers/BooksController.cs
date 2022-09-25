@@ -1,8 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using WebApiKhanhPhong.DbContext;
+using WebApiKhanhPhong.Dtos;
 using WebApiKhanhPhong.Models;
+using WebApiKhanhPhong.Services.IServices;
 
 namespace WebApiKhanhPhong.Controllers
 {
@@ -11,60 +13,52 @@ namespace WebApiKhanhPhong.Controllers
     //https:localhost:5001/api/books/
     public class BooksController:ControllerBase
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IBookService _bookService;
+        private readonly IMapper _mapper;
 
-        public BooksController(ApplicationDbContext db)
+        public BooksController(IBookService bookService, IMapper mapper)
         {
-            _db = db;
+            _bookService = bookService;
+            _mapper = mapper;
         }
 
         [HttpGet]
         //https:localhost:5001/api/books
-        public IList<Book> GetAll()
+        public async Task<IList<Book>> GetAll()
         {
-            return _db.Books.ToList();
+            return await _bookService.GetAll();
         }
 
         [HttpGet("{id:int}")]
         //https:localhost:5001/api/books/{id}
-        public Book GetById([FromRoute] int id)
+        public async Task<Book> GetById([FromRoute] int id)
         {
-            return _db.Books.Find(id);
+            return await _bookService.GetById(id);
         }
 
         [HttpPost]
         //https:localhost:5001/api/books
-        public IActionResult Create(Book bookInput)
+        public async Task<IActionResult> Create(UpsertBookDtos bookInput)
         {
-            _db.Books.Add(bookInput);
-            _db.SaveChanges();
+            var book = _mapper.Map<Book>(bookInput);
+            await _bookService.Create(book);
             return StatusCode(201);
         }
 
         [HttpPut("{id:int}")]
         //https:localhost:5001/api/books/{id}
-        public IActionResult Update([FromRoute] int id, Book bookInput)
+        public async Task<IActionResult> Update([FromRoute] int id, UpsertBookDtos bookInput)
         {
-            var book = _db.Books.Find(id);
-
-            book.Name = bookInput.Name;
-            book.Author = bookInput.Author;
-            book.PageNumber = bookInput.PageNumber;
-
-            _db.Books.Update(book);
-            _db.SaveChanges();
-
+            var book = _mapper.Map<Book>(bookInput);
+            await _bookService.Update(id, book);
             return StatusCode(200);
         }
 
         [HttpDelete("{id:int}")]
         //https:localhost:5001/api/books/{id}
-        public IActionResult Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var book = _db.Books.Find(id);
-            _db.Books.Remove(book);
-            _db.SaveChanges();
-
+            await _bookService.Delete(id);
             return StatusCode(200);
         }
     }

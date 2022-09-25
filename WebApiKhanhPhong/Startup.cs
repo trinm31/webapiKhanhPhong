@@ -13,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WebApiKhanhPhong.DbContext;
+using WebApiKhanhPhong.Services;
+using WebApiKhanhPhong.Services.IServices;
 
 namespace WebApiKhanhPhong
 {
@@ -37,6 +39,13 @@ namespace WebApiKhanhPhong
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApiKhanhPhong", Version = "v1" });
             });
+            
+            services.AddScoped<IBookService, BookService>();
+            
+            //auto mapper config
+            var mapper = MappingConfig.RegisterMaps().CreateMapper();
+            services.AddSingleton(mapper);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
