@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -13,7 +14,10 @@ namespace WebApiKhanhPhong.Extensions
         public static IServiceCollection AddDatabase(this IServiceCollection service)
         {
             service.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(AppSettings.ConnectionStrings));
+            {
+                options.UseSqlServer(AppSettings.ConnectionStrings,
+                    sqlOptions => sqlOptions.CommandTimeout(12000));
+            });
             
             return service;
         }
@@ -21,7 +25,8 @@ namespace WebApiKhanhPhong.Extensions
         public static IServiceCollection AddService(this IServiceCollection service)
         {
             service.AddScoped<IBookService, BookService>();
-            service.AddScoped<IJwtUtils, JwtUtils>();
+            // service.AddScoped<IUserService, UserService>();
+            // service.AddScoped<IJwtUtils, JwtUtils>();
             return service;
         }
         
@@ -38,8 +43,40 @@ namespace WebApiKhanhPhong.Extensions
         {
             service.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApiKhanhPhong", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "web api khanh phong", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description =
+                        "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
+                        "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
+                        "Example: \"Bearer 12345abcdef\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>()
+                    }
+                });
+
             });
+            
             return service;
         }
     }

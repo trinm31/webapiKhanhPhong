@@ -9,8 +9,8 @@ using WebApiKhanhPhong.DbContext;
 namespace WebApiKhanhPhong.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221002093130_userToDb")]
-    partial class userToDb
+    [Migration("20221030144418_initdb")]
+    partial class initdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -53,8 +54,8 @@ namespace WebApiKhanhPhong.Services
             {
 
                 // validate
-                var userList = await _db.Users.AnyAsync(x => x.Username == model.Username);
-                if (userList)
+                var userList = _db.Users.Where(x => x.Username == model.Username).ToList();
+                if (userList.Count > 0)
                     throw new Exception("Username '" + model.Username + "' is already taken");
 
                 // map model to new user object

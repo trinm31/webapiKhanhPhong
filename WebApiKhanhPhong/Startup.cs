@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApiKhanhPhong.Extensions;
+using WebApiKhanhPhong.Middleware;
 
 namespace WebApiKhanhPhong
 {
@@ -42,7 +43,9 @@ namespace WebApiKhanhPhong
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+            
+            //app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

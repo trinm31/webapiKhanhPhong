@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using WebApiKhanhPhong.Authorization;
 using WebApiKhanhPhong.Dtos;
 using WebApiKhanhPhong.Models;
 using WebApiKhanhPhong.Services.IServices;
@@ -10,6 +11,7 @@ namespace WebApiKhanhPhong.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    //[Authorize]
     //https:localhost:5001/api/books/
     public class BooksController:ControllerBase
     {
